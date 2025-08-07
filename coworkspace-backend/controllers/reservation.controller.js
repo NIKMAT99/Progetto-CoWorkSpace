@@ -1,0 +1,37 @@
+const pool = require('../db');
+
+exports.createReservation = async (req, res) => {
+    const { space_id, date, start_time, end_time } = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        await client.query(
+            'INSERT INTO reservations (user_id, space_id, date, start_time, end_time, status) VALUES ($1, $2, $3, $4, $5, $6)',
+            [req.user.id, space_id, date, start_time, end_time, 'confermata']
+        );
+
+        await client.query(
+            'UPDATE availability SET is_available = false WHERE space_id = $1 AND date = $2 AND start_time = $3 AND end_time = $4',
+            [space_id, date, start_time, end_time]
+        );
+
+        await client.query('COMMIT');
+        res.status(201).json({ message: 'Prenotazione creata e disponibilità aggiornata' });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ message: 'Errore prenotazione', error: err.message });
+    } finally {
+        client.release();
+    }
+};
+
+exports.getMyReservations = async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM reservations WHERE user_id = $1', [req.user.id]);
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ message: 'Errore recupero prenotazioni', error: err.message });
+    }
+};
