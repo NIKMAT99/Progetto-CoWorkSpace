@@ -5,5 +5,7 @@ const verifyToken = require('../middleware/auth.middleware');
 
 router.post('/', verifyToken, reservationController.createReservation);
 router.get('/me', verifyToken, reservationController.getMyReservations);
+router.delete('/:id', verifyToken, reservationController.deleteReservation);
+
 
 module.exports = router;

@@ -66,4 +66,50 @@ $(document).ready(function () {
         localStorage.removeItem('jwt_token');
         window.location.href = 'login.html';
     });
+    function loadReservations() {
+        $.ajax({
+            url: 'http://localhost:3000/reservations/me',
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+            success: function (reservations) {
+                const tbody = $('#reservation-list');
+                tbody.empty();
+
+                reservations.forEach(r => {
+                    const row = $(`
+          <tr>
+            <td>${r.space_type}</td>
+            <td>${r.date}</td>
+            <td>${r.start_time} - ${r.end_time}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" data-id="${r.id}">❌ Cancella</button>
+            </td>
+          </tr>
+        `);
+
+                    row.find('button').click(function () {
+                        if (confirm('Sei sicuro di voler cancellare questa prenotazione?')) {
+                            $.ajax({
+                                url: `http://localhost:3000/reservations/${r.id}`,
+                                method: 'DELETE',
+                                headers: { Authorization: `Bearer ${token}` },
+                                success: function () {
+                                    alert('Prenotazione cancellata');
+                                    loadReservations(); // ricarica lista
+                                },
+                                error: function () {
+                                    alert('Errore nella cancellazione');
+                                }
+                            });
+                        }
+                    });
+
+                    tbody.append(row);
+                });
+            }
+        });
+    }
+
+    loadReservations();
+
 });

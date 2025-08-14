@@ -35,3 +35,26 @@ exports.getMyReservations = async (req, res) => {
         res.status(500).json({ message: 'Errore recupero prenotazioni', error: err.message });
     }
 };
+
+exports.deleteReservation = async (req, res) => {
+    const reservationId = req.params.id;
+    const userId = req.user.id; // preso dal token JWT
+
+    try {
+        // Verifica che la prenotazione appartenga all'utente
+        const check = await db.query(
+            'SELECT * FROM reservation WHERE id = $1 AND user_id = $2',
+            [reservationId, userId]
+        );
+
+        if (check.rows.length === 0) {
+            return res.status(404).json({ message: 'Prenotazione non trovata' });
+        }
+
+        await db.query('DELETE FROM reservation WHERE id = $1', [reservationId]);
+
+        res.json({ message: 'Prenotazione cancellata' });
+    } catch (err) {
+        res.status(500).json({ message: 'Errore durante la cancellazione', error: err });
+    }
+};
