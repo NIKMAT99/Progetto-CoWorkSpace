@@ -3,40 +3,230 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dettaglio Sede</title>
+    <title>Dettaglio Sede | CoWorkSpace</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/forms.css">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark px-3">
-    <a class="navbar-brand" href="index.html">🏠 Home</a>
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <i class="fas fa-home me-2"></i>Home
+        </a>
+    </div>
 </nav>
 
-<div class="container my-4">
-    <div id="location-details">
-        <p>Caricamento...</p>
+<!-- Location Header -->
+<section class="bg-dark text-light py-5 mb-5">
+    <div class="container text-center">
+        <h1 id="location-name" class="display-4 mb-3">Caricamento...</h1>
+        <p id="location-address" class="lead">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            <span id="address">Caricamento indirizzo...</span>
+        </p>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container mb-5">
+    <div class="row">
+        <!-- Location Details -->
+        <div class="col-lg-8">
+            <div class="mb-5">
+                <img id="main-image" src="" class="img-fluid rounded shadow mb-3" alt="Foto sede" style="height: 400px; object-fit: cover; width: 100%;">
+            </div>
+
+            <div class="mb-5">
+                <h3 class="section-title">Descrizione</h3>
+                <p id="location-description" class="lead">Caricamento descrizione...</p>
+            </div>
+
+            <div class="mb-5">
+                <h3 class="section-title">Spazi disponibili</h3>
+                <div class="row g-4" id="spaces-container">
+                    <div class="col-12 text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Caricamento...</span>
+                        </div>
+                        <p class="mt-2">Caricamento spazi...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Sidebar -->
+        <div class="col-lg-4">
+            <div class="bg-white p-4 shadow-sm rounded">
+                <h3 class="mb-4"><i class="fas fa-calendar-check me-2"></i>Prenota</h3>
+
+                <div id="auth-message">
+                    <p>Per prenotare uno spazio, accedi al tuo account.</p>
+                    <a href="login.html" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-sign-in-alt me-2"></i>Accedi
+                    </a>
+                    <p class="small text-muted">Non hai un account? <a href="register.html">Registrati</a></p>
+                </div>
+
+                <div id="booking-form" class="d-none">
+                    <div class="mb-3">
+                        <label for="booking-space" class="form-label">Seleziona spazio</label>
+                        <select class="form-control" id="booking-space">
+                            <option value="">Caricamento spazi...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="booking-date" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="booking-date" min="">
+                    </div>
+                    <button class="btn btn-primary w-100" onclick="handleBooking()">
+                        <i class="fas fa-check me-2"></i>Crea Prenotazione
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const locationId = urlParams.get('id');
+<!-- Footer -->
+<footer>
+    <div class="container text-center">
+        <p class="copyright">CoWorkSpace &copy; <span id="current-year"></span> - Tutti i diritti riservati</p>
+    </div>
+</footer>
 
-    $.get(`http://localhost:3000/locations`, function (locations) {
-        const loc = locations.find(l => l.id == locationId);
-        if (!loc) {
-            $('#location-details').html('<p class="text-danger">Sede non trovata.</p>');
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+    // Aggiorna anno corrente
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // Gestione prenotazione
+    async function handleBooking() {
+        const spaceId = document.getElementById('booking-space').value;
+        const date = document.getElementById('booking-date').value;
+
+        if (!spaceId || !date) {
+            alert('Seleziona uno spazio e una data');
             return;
         }
 
-        $('#location-details').html(`
-        <h2>${loc.name}</h2>
-        <p><strong>Città:</strong> ${loc.city}</p>
-        <p><strong>Indirizzo:</strong> ${loc.address}</p>
-        <img src="assets/img/locations/${loc.id}.jpg" class="img-fluid my-3 rounded shadow" alt="${loc.name}">
-        <p>Questa sede offre diversi spazi coworking. Per prenotare, accedi alla dashboard.</p>
-        <a href="login.html" class="btn btn-success">Accedi</a>
-      `);
+        try {
+            const token = localStorage.getItem('jwt_token');
+            const response = await fetch('http://localhost:3000/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    spaceId: parseInt(spaceId),
+                    date: date,
+                    startTime: '08:00',
+                    endTime: '00:00'
+                })
+            });
+
+            if (response.ok) {
+                alert('Prenotazione creata con successo!');
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Errore nella prenotazione');
+            }
+        } catch (error) {
+            alert('Errore di connessione');
+        }
+    }
+
+    // Caricamento dati
+    document.addEventListener('DOMContentLoaded', async function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const locationId = urlParams.get('id');
+
+        if (!locationId) {
+            document.getElementById('location-details').innerHTML = '<div class="alert alert-danger">ID sede non specificato.</div>';
+            return;
+        }
+
+        try {
+            // 1. Carica la location specifica
+            const location = await fetch(`http://localhost:3000/locations/${locationId}`)
+                .then(res => res.json());
+
+            // 2. Aggiorna header
+            document.getElementById('location-name').textContent = location.name;
+            document.getElementById('address').textContent = `${location.address}, ${location.city}`;
+
+            // 3. Aggiorna immagine
+            document.getElementById('main-image').src = `assets/img/locations/${location.id}.jpg`;
+            document.getElementById('main-image').alt = location.name;
+
+            // 4. Aggiorna descrizione
+            document.getElementById('location-description').textContent =
+                location.description || 'Questa sede offre spazi di coworking moderni e ben attrezzati, ideali per professionisti e team.';
+
+            // 5. Carica TUTTI gli spazi e filtra per locationId
+            const allSpaces = await fetch('http://localhost:3000/spaces')
+                .then(res => res.json());
+
+            const spaces = allSpaces.filter(space => space.locationId == locationId);
+
+            // 6. Render spazi
+            const container = document.getElementById('spaces-container');
+            if (spaces.length === 0) {
+                container.innerHTML = `
+                        <div class="col-12 text-center py-4">
+                            <i class="fas fa-door-open fa-3x text-muted mb-3"></i>
+                            <h4>Nessuno spazio disponibile</h4>
+                            <p class="text-muted">Non ci sono spazi in questa sede al momento.</p>
+                        </div>
+                    `;
+            } else {
+                container.innerHTML = spaces.map(space => `
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <img src="assets/img/spaces/${space.id}.jpg" class="card-img-top" alt="${space.name}" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">${space.name}</h5>
+                                    <p class="card-text">${space.description || 'Spazio confortevole e ben attrezzato'}</p>
+                                    <p class="text-primary fw-bold">${space.price}€/ora</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                // Popola dropdown prenotazione
+                const bookingSelect = document.getElementById('booking-space');
+                bookingSelect.innerHTML = spaces.map(space =>
+                    `<option value="${space.id}">${space.name} - ${space.price}€/ora</option>`
+                ).join('');
+            }
+
+            // 7. Gestione autenticazione
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                document.getElementById('auth-message').classList.add('d-none');
+                document.getElementById('booking-form').classList.remove('d-none');
+
+                // Imposta data minima (oggi)
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('booking-date').min = today;
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('spaces-container').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Errore nel caricamento dei dati
+                        </div>
+                    </div>
+                `;
+        }
     });
 </script>
 </body>

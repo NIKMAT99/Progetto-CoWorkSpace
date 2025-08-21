@@ -3,162 +3,411 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prenota uno Spazio</title>
+    <title>Prenota Spazio | CoWorkSpace</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/forms.css">
     <style>
+        .booking-container {
+            min-height: 80vh;
+            padding: 40px 0;
+        }
+
+        .booking-card {
+            background: var(--light-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
         .slot-cell {
+            padding: 15px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
             text-align: center;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
             cursor: pointer;
+            transition: var(--transition);
+            background: var(--light-color);
         }
+
         .slot-cell:hover {
-            background-color: #f0f0f0;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
         }
-        .slot-booked {
-            background-color: #ffcccc;
+
+        .slot-cell.selected {
+            background: var(--primary-color);
+            color: var(--light-color);
+            border-color: var(--primary-color);
+        }
+
+        .slot-cell.booked {
+            background: var(--secondary-color);
+            color: var(--dark-color);
+            border-color: var(--secondary-color);
             cursor: not-allowed;
+            opacity: 0.6;
         }
-        .slot-selected {
-            background-color: #c6f6d5;
+
+        .space-card {
+            background: var(--light-color);
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+
+        .space-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .space-card.selected {
+            border-color: var(--primary-color);
+            background: var(--secondary-color);
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark px-3">
-    <a class="navbar-brand" href="index.html">🏠 Home</a>
-    <div class="ms-auto">
-        <a href="dashboard.html" class="btn btn-outline-light btn-sm">Dashboard</a>
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <i class="fas fa-home me-2"></i>CoWorkSpace
+        </a>
+        <div class="ms-auto">
+            <a href="dashboard.html" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+            </a>
+        </div>
     </div>
 </nav>
 
-<div class="container my-4">
-    <h2>Prenota uno Spazio</h2>
+<!-- Main Content -->
+<div class="container booking-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="booking-card">
+                <h2 class="section-title text-center mb-4">
+                    <i class="fas fa-calendar-plus me-2"></i>Prenota uno Spazio
+                </h2>
 
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label for="location-select" class="form-label">Sede</label>
-            <select id="location-select" class="form-select"></select>
-        </div>
-        <div class="col-md-6">
-            <label for="space-select" class="form-label">Spazio</label>
-            <select id="space-select" class="form-select" disabled></select>
+                <!-- Step 1: Seleziona Sede -->
+                <div class="mb-5">
+                    <h4 class="mb-3"><i class="fas fa-building me-2"></i>1. Seleziona la Sede</h4>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                        <select id="location-select" class="form-control" required>
+                            <option value="">-- Seleziona una sede --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 2: Seleziona Spazio -->
+                <div class="mb-5" id="space-selection" style="display: none;">
+                    <h4 class="mb-3"><i class="fas fa-door-open me-2"></i>2. Scegli lo Spazio</h4>
+                    <div id="spaces-container" class="row g-3">
+                        <!-- Spazi verranno caricati qui -->
+                    </div>
+                </div>
+
+                <!-- Step 3: Seleziona Data -->
+                <div class="mb-5" id="date-selection" style="display: none;">
+                    <h4 class="mb-3"><i class="fas fa-calendar-day me-2"></i>3. Scegli la Data</h4>
+                    <div class="input-group" style="max-width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                        <input type="date" id="reservation-date" class="form-control" min="" required>
+                    </div>
+                </div>
+
+                <!-- Step 4: Seleziona Orario -->
+                <div class="mb-4" id="time-selection" style="display: none;">
+                    <h4 class="mb-3"><i class="fas fa-clock me-2"></i>4. Scegli l'Orario</h4>
+                    <p class="text-muted mb-3">Seleziona un orario per la tua prenotazione (08:00 - 00:00)</p>
+                    <div class="slot-grid" id="slots-grid">
+                        <!-- Slots verranno generati qui -->
+                    </div>
+                </div>
+
+                <!-- Conferma Prenotazione -->
+                <div class="text-center mt-5" id="confirmation" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="selected-info">Seleziona sede, spazio, data e orario</span>
+                    </div>
+                    <button id="confirm-btn" class="btn btn-primary btn-lg" disabled>
+                        <i class="fas fa-check me-2"></i>Conferma Prenotazione
+                    </button>
+                </div>
+
+                <div id="booking-message" class="form-message mt-4" style="display: none;"></div>
+            </div>
         </div>
     </div>
-
-    <div class="mb-3">
-        <label for="reservation-date" class="form-label">Data</label>
-        <input type="date" id="reservation-date" class="form-control" disabled />
-    </div>
-
-    <div class="mt-4" id="slots-grid"></div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script>
-    const token = localStorage.getItem('jwt_token');
-    if (!token) window.location.href = 'login.html';
+<!-- Footer -->
+<footer>
+    <div class="container text-center">
+        <p class="copyright">CoWorkSpace &copy; <span id="current-year"></span> - Tutti i diritti riservati</p>
+    </div>
+</footer>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+    // Variabili globali
+    let selectedLocation = null;
     let selectedSpace = null;
     let selectedDate = null;
-    let selectedSlot = null;
+    let selectedTime = '08:00-00:00'; // Orario fisso come da specifica
+
+    // Controllo autenticazione
+    document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Aggiorna anno corrente
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Imposta data minima (oggi)
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('reservation-date').min = today;
+
+        // Carica le location
+        loadLocations();
+    });
 
     // Carica le location
-    $.get('http://localhost:3000/locations', function (locations) {
-        const select = $('#location-select');
-        select.append('<option value="">-- Seleziona sede --</option>');
-        locations.forEach(loc => {
-            select.append(`<option value="${loc.id}">${loc.name} - ${loc.city}</option>`);
-        });
-    });
+    async function loadLocations() {
+        try {
+            const response = await fetch('http://localhost:3000/locations');
+            const locations = await response.json();
 
-    // Quando selezioni una sede, carica gli spazi
-    $('#location-select').on('change', function () {
-        const locationId = $(this).val();
-        $('#space-select').empty().prop('disabled', true);
-        $('#reservation-date').val('').prop('disabled', true);
-        $('#slots-grid').empty();
-
-        if (!locationId) return;
-
-        $.get('http://localhost:3000/spaces', function (spaces) {
-            const filtered = spaces.filter(s => s.location_id == locationId);
-            const select = $('#space-select');
-            select.append('<option value="">-- Seleziona spazio --</option>');
-            filtered.forEach(space => {
-                select.append(`<option value="${space.id}">${space.type} - €${space.price}</option>`);
+            const select = document.getElementById('location-select');
+            locations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc.id;
+                option.textContent = `${loc.name} - ${loc.city}`;
+                select.appendChild(option);
             });
-            select.prop('disabled', false);
-        });
+
+        } catch (error) {
+            showMessage('Errore nel caricamento delle sedi', 'error');
+        }
+    }
+
+    // Quando cambia la sede
+    document.getElementById('location-select').addEventListener('change', async function() {
+        selectedLocation = this.value;
+        selectedSpace = null;
+        selectedDate = null;
+
+        if (!selectedLocation) {
+            hideElement('space-selection');
+            hideElement('date-selection');
+            hideElement('time-selection');
+            hideElement('confirmation');
+            return;
+        }
+
+        await loadSpaces(selectedLocation);
+        showElement('space-selection');
+        hideElement('date-selection');
+        hideElement('time-selection');
+        hideElement('confirmation');
+        updateSelectionInfo();
     });
 
-    // Quando selezioni uno spazio
-    $('#space-select').on('change', function () {
-        selectedSpace = $(this).val();
-        $('#reservation-date').prop('disabled', !selectedSpace);
-        $('#slots-grid').empty();
-    });
+    // Carica spazi per location
+    async function loadSpaces(locationId) {
+        try {
+            const response = await fetch('http://localhost:3000/spaces');
+            const allSpaces = await response.json();
+            const spaces = allSpaces.filter(space => space.locationId == locationId);
 
-    // Quando selezioni una data
-    $('#reservation-date').on('change', function () {
-        selectedDate = $(this).val();
-        if (!selectedSpace || !selectedDate) return;
+            const container = document.getElementById('spaces-container');
+            container.innerHTML = '';
 
-        $.ajax({
-            url: `http://localhost:3000/availability/dynamic?space_id=${selectedSpace}&date=${selectedDate}`,
-            headers: { Authorization: `Bearer ${token}` },
-            success: function (slots) {
-                const container = $('#slots-grid');
-                container.empty();
-                container.append('<h5>Seleziona una fascia oraria:</h5>');
-
-                const row = $('<div class="d-flex flex-wrap gap-2 mt-3"></div>');
-                for (let h = 8; h < 24; h++) {
-                    const start = `${String(h).padStart(2, '0')}:00`;
-                    const end = `${String(h + 1).padStart(2, '0')}:00`;
-
-                    const booked = !slots.some(s => s.start_time === start);
-                    const slotDiv = $(`<div class="slot-cell ${booked ? 'slot-booked' : ''}">${start} - ${end}</div>`);
-
-                    if (!booked) {
-                        slotDiv.click(function () {
-                            $('.slot-cell').removeClass('slot-selected');
-                            $(this).addClass('slot-selected');
-                            selectedSlot = { start_time: start, end_time: end };
-
-                            // Conferma immediata
-                            if (confirm(`Confermi la prenotazione per il ${selectedDate} dalle ${start} alle ${end}?`)) {
-                                $.ajax({
-                                    url: 'http://localhost:3000/reservations',
-                                    method: 'POST',
-                                    headers: {
-                                        Authorization: `Bearer ${token}`,
-                                        'Content-Type': 'application/json'
-                                    },
-                                    data: JSON.stringify({
-                                        space_id: selectedSpace,
-                                        date: selectedDate,
-                                        start_time: start,
-                                        end_time: end
-                                    }),
-                                    success: () => {
-                                        alert('Prenotazione confermata!');
-                                        window.location.href = 'dashboard.html';
-                                    },
-                                    error: () => alert('Errore nella prenotazione.')
-                                });
-                            }
-                        });
-                    }
-                    row.append(slotDiv);
-                }
-                container.append(row);
-            },
-            error: function () {
-                $('#slots-grid').html('<p class="text-danger">Errore nel caricamento degli orari.</p>');
+            if (spaces.length === 0) {
+                container.innerHTML = `
+                        <div class="col-12 text-center py-4">
+                            <i class="fas fa-door-open fa-3x text-muted mb-3"></i>
+                            <h5>Nessuno spazio disponibile</h5>
+                            <p class="text-muted">Non ci sono spazi in questa sede al momento.</p>
+                        </div>
+                    `;
+                return;
             }
-        });
+
+            spaces.forEach(space => {
+                const spaceCard = document.createElement('div');
+                spaceCard.className = 'col-md-6';
+                spaceCard.innerHTML = `
+                        <div class="space-card" data-space-id="${space.id}">
+                            <h5>${space.name}</h5>
+                            <p class="mb-1">${space.description || 'Spazio confortevole'}</p>
+                            <p class="text-primary fw-bold">${space.price}€/ora</p>
+                            <button class="btn btn-outline-primary btn-sm select-space-btn">
+                                Seleziona
+                            </button>
+                        </div>
+                    `;
+                container.appendChild(spaceCard);
+            });
+
+            // Aggiungi event listener ai pulsanti
+            document.querySelectorAll('.select-space-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const spaceCard = this.closest('.space-card');
+                    const spaceId = spaceCard.dataset.spaceId;
+
+                    // Rimuovi selezione precedente
+                    document.querySelectorAll('.space-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+
+                    // Aggiungi selezione corrente
+                    spaceCard.classList.add('selected');
+                    selectedSpace = spaceId;
+
+                    showElement('date-selection');
+                    hideElement('time-selection');
+                    hideElement('confirmation');
+                    updateSelectionInfo();
+                });
+            });
+
+        } catch (error) {
+            showMessage('Errore nel caricamento degli spazi', 'error');
+        }
+    }
+
+    // Quando cambia la data
+    document.getElementById('reservation-date').addEventListener('change', function() {
+        selectedDate = this.value;
+
+        if (selectedDate) {
+            showElement('time-selection');
+            showElement('confirmation');
+            generateTimeSlots();
+            updateSelectionInfo();
+        } else {
+            hideElement('time-selection');
+            hideElement('confirmation');
+        }
     });
+
+    // Genera gli slot temporali (sempre disponibili 08:00-00:00)
+    function generateTimeSlots() {
+        const slotsGrid = document.getElementById('slots-grid');
+        slotsGrid.innerHTML = '';
+
+        // Crea un unico slot per l'intera giornata (come da specifica)
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'slot-cell selected';
+        slotDiv.innerHTML = `
+                <div><strong>08:00 - 00:00</strong></div>
+                <small>Intera giornata</small>
+            `;
+
+        slotsGrid.appendChild(slotDiv);
+
+        // Abilita il pulsante di conferma
+        document.getElementById('confirm-btn').disabled = false;
+    }
+
+    // Conferma prenotazione
+    document.getElementById('confirm-btn').addEventListener('click', async function() {
+        if (!selectedLocation || !selectedSpace || !selectedDate) {
+            showMessage('Completa tutti i campi obbligatori', 'error');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('jwt_token');
+            const response = await fetch('http://localhost:3000/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    spaceId: parseInt(selectedSpace),
+                    date: selectedDate,
+                    startTime: '08:00',
+                    endTime: '00:00'
+                })
+            });
+
+            if (response.ok) {
+                showMessage('Prenotazione creata con successo!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } else {
+                const error = await response.json();
+                showMessage(error.message || 'Errore nella prenotazione', 'error');
+            }
+
+        } catch (error) {
+            showMessage('Errore di connessione', 'error');
+        }
+    });
+
+    // Funzioni di utilità
+    function showElement(id) {
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function hideElement(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function showMessage(message, type) {
+        const msgDiv = document.getElementById('booking-message');
+        msgDiv.textContent = message;
+        msgDiv.className = `form-message mt-4 ${type}`;
+        msgDiv.style.display = 'block';
+    }
+
+    function updateSelectionInfo() {
+        const infoDiv = document.getElementById('selected-info');
+        let info = '';
+
+        if (selectedLocation) {
+            const locationSelect = document.getElementById('location-select');
+            const locationName = locationSelect.options[locationSelect.selectedIndex].text;
+            info += `Sede: ${locationName}`;
+        }
+
+        if (selectedSpace) {
+            const spaceCard = document.querySelector(`[data-space-id="${selectedSpace}"]`);
+            const spaceName = spaceCard.querySelector('h5').textContent;
+            info += ` | Spazio: ${spaceName}`;
+        }
+
+        if (selectedDate) {
+            info += ` | Data: ${new Date(selectedDate).toLocaleDateString('it-IT')}`;
+        }
+
+        info += ' | Orario: 08:00 - 00:00';
+        infoDiv.textContent = info;
+    }
 </script>
 </body>
 </html>

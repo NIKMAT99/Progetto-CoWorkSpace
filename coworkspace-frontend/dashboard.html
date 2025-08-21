@@ -3,57 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard - CoWorkSpace</title>
+    <title>Dashboard | CoWorkSpace</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/forms.css">
+    <style>
+        .dashboard-card {
+            background: var(--light-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .quick-action {
+            display: block;
+            padding: 20px;
+            background: var(--secondary-color);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark-color);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .quick-action:hover {
+            border-color: var(--primary-color);
+            background: var(--light-color);
+            transform: translateY(-3px);
+        }
+
+        .quick-action i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .reservation-card {
+            background: var(--light-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .user-welcome {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-    <a class="navbar-brand" href="index.html">🏠 Home</a>
-    <div class="ms-auto d-flex gap-2">
-        <button class="btn btn-outline-light btn-sm" id="logout-btn">Logout</button>
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <i class="fas fa-home me-2"></i>CoWorkSpace
+        </a>
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-outline-light btn-sm" id="logout-btn">
+                <i class="fas fa-sign-out-alt me-1"></i>Logout
+            </button>
+        </div>
     </div>
 </nav>
 
-
-<div class="container my-4">
-    <h2>Benvenuto <span id="user-name"></span></h2>
-    <p><strong>Email:</strong> <span id="user-email"></span></p>
-    <p><strong>Ruolo:</strong> <span id="user-role"></span></p>
-
-    <hr>
-    <div id="admin-section" class="mt-4">
-        <h4>Vuoi prenotare uno spazio?</h4>
-        <ul class="list-group">
-            <li class="list-group-item"><a href="prenotazione.html">Prenota uno spazio</a></li>
-            <li class="list-group-item admin-only d-none"><a href="aggiungi_disponibilita.html">Aggiungi Disponibilità</a></li>
-            <li class="list-group-item admin-only d-none"><a href="reset_disponibilita.html">Reset Disponibilità</a></li>
-            <li class="list-group-item admin-only d-none"><a href="aggiungi_spazio.html">Aggiungi Spazio</a></li>
-            <li class="list-group-item admin-only d-none"><a href="aggiungi_sede.html">Aggiungi Sede</a></li>
-        </ul>
-
+<!-- Main Content -->
+<div class="container my-5">
+    <!-- User Welcome Section -->
+    <div class="user-welcome text-center mb-5">
+        <h1 class="display-5 fw-light">Benvenuto, <span id="user-name"></span>!</h1>
+        <p class="lead mb-1"><strong>Email:</strong> <span id="user-email"></span></p>
+        <p class="mb-0"><strong>Ruolo:</strong> <span id="user-role" class="badge bg-light text-dark"></span></p>
     </div>
 
+    <!-- Quick Actions Section -->
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <a href="prenotazione.html" class="quick-action">
+                <i class="fas fa-calendar-plus"></i>
+                <h5>Nuova Prenotazione</h5>
+                <small>Prenota uno spazio</small>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4 admin-only d-none">
+            <a href="aggiungi_spazio.html" class="quick-action">
+                <i class="fas fa-door-open"></i>
+                <h5>Aggiungi Spazio</h5>
+                <small>Crea nuovo spazio</small>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4 admin-only d-none">
+            <a href="aggiungi_sede.html" class="quick-action">
+                <i class="fas fa-building"></i>
+                <h5>Aggiungi Sede</h5>
+                <small>Crea nuova sede</small>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <a href="index.html" class="quick-action">
+                <i class="fas fa-search"></i>
+                <h5>Sfoglia Sedi</h5>
+                <small>Scopri le location</small>
+            </a>
+        </div>
+    </div>
 
-    <h4>Le tue prenotazioni</h4>
-    <table class="table table-striped mt-3">
-        <thead>
-        <tr>
-            <th>Spazio</th>
-            <th>Data</th>
-            <th>Orario</th>
-            <th>Azioni</th>
-        </tr>
-        </thead>
-        <tbody id="reservation-list">
-        <tr><td colspan="4" class="text-center">Caricamento...</td></tr>
-        </tbody>
-    </table>
+    <!-- Reservations Section -->
+    <div class="dashboard-card">
+        <h3 class="section-title mb-4">
+            <i class="fas fa-calendar-check me-2"></i>Le tue prenotazioni
+        </h3>
 
+        <div id="reservation-list">
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Caricamento...</span>
+                </div>
+                <p class="mt-2">Caricamento prenotazioni...</p>
+            </div>
+        </div>
+
+        <div id="no-reservations" class="text-center py-5 d-none">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h4>Nessuna prenotazione</h4>
+            <p class="text-muted">Non hai ancora effettuato prenotazioni.</p>
+            <a href="prenotazione.html" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Prenota ora
+            </a>
+        </div>
+    </div>
+
+    <!-- Admin Stats Section (solo per admin) -->
+    <div class="admin-only d-none">
+        <div class="dashboard-card">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-chart-bar me-2"></i>Statistiche
+            </h3>
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <div class="bg-primary text-light p-4 rounded">
+                        <h2 class="mb-0" id="total-spaces">0</h2>
+                        <small>Spazi totali</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="bg-success text-light p-4 rounded">
+                        <h2 class="mb-0" id="total-locations">0</h2>
+                        <small>Sedi</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="bg-warning text-dark p-4 rounded">
+                        <h2 class="mb-0" id="total-reservations">0</h2>
+                        <small>Prenotazioni</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Footer -->
+<footer>
+    <div class="container text-center">
+        <div class="footer-links mb-3">
+            <a href="index.html">Home</a>
+            <a href="prenotazione.html">Prenotazioni</a>
+            <a href="contatti.html">Contatti</a>
+        </div>
+        <div class="social-icons mb-3">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <p class="copyright">CoWorkSpace &copy; <span id="current-year"></span> - Tutti i diritti riservati</p>
+    </div>
+</footer>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/dashboard.js"></script>
+<script>
+    // Aggiorna anno corrente
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user_role');
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('user_email');
+        window.location.href = 'index.html';
+    });
+
+    // Carica dati utente
+    document.addEventListener('DOMContentLoaded', function() {
+        const userName = localStorage.getItem('user_name') || 'Utente';
+        const userEmail = localStorage.getItem('user_email') || '';
+        const userRole = localStorage.getItem('user_role') || 'user';
+
+        document.getElementById('user-name').textContent = userName;
+        document.getElementById('user-email').textContent = userEmail;
+        document.getElementById('user-role').textContent = userRole;
+
+        // Mostra sezioni admin
+        if (userRole === 'admin' || userRole === 'gestore') {
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.classList.remove('d-none');
+            });
+        }
+    });
+</script>
 </body>
 </html>

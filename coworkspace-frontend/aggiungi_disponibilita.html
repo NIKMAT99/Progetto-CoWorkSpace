@@ -1,44 +1,163 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aggiungi Disponibilità</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aggiungi Disponibilità | CoWorkSpace</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/forms.css">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark px-3">
-  <a class="navbar-brand" href="dashboard.html">← Dashboard</a>
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="dashboard.html">
+      <i class="fas fa-arrow-left me-2"></i>Torna alla Dashboard
+    </a>
+  </div>
 </nav>
 
-<div class="container my-4">
-  <h2>Aggiungi Disponibilità</h2>
+<!-- Main Content -->
+<main class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="form-container">
+        <h2 class="section-title"><i class="fas fa-calendar-plus form-icon"></i>Aggiungi Disponibilità</h2>
 
-  <form id="add-availability-form">
-    <div class="mb-3">
-      <label for="space-id" class="form-label">ID Spazio</label>
-      <input type="number" class="form-control" id="space-id" required>
+        <form id="add-availability-form">
+          <!-- Space Selection -->
+          <div class="mb-4">
+            <label for="space-id" class="form-label">Seleziona Spazio</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-door-open"></i></span>
+              <select class="form-control" id="space-id" required>
+                <option value="" disabled selected>Seleziona uno spazio</option>
+                <!-- Options will be populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Date Picker -->
+          <div class="mb-4">
+            <label for="date" class="form-label">Data</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
+              <input type="date" class="form-control" id="date" required>
+            </div>
+          </div>
+
+          <!-- Time Range -->
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <label for="start-time" class="form-label">Ora Inizio</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                <input type="time" class="form-control" id="start-time" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="end-time" class="form-label">Ora Fine</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                <input type="time" class="form-control" id="end-time" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recurring Options -->
+          <div class="mb-4">
+            <label class="form-label">Opzioni Ricorrenza</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="recurring">
+              <label class="form-check-label" for="recurring">
+                Ripeti questa disponibilità
+              </label>
+            </div>
+            <div id="recurring-options" class="mt-3 p-3 bg-light" style="display: none;">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="repeat-frequency" class="form-label">Frequenza</label>
+                  <select class="form-control" id="repeat-frequency">
+                    <option value="daily">Giornaliera</option>
+                    <option value="weekly">Settimanale</option>
+                    <option value="monthly">Mensile</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="repeat-until" class="form-label">Fino al</label>
+                  <input type="date" class="form-control" id="repeat-until">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-4">
+            <label for="notes" class="form-label">Note (opzionale)</label>
+            <textarea class="form-control" id="notes" rows="2" placeholder="Aggiungi eventuali note particolari"></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>Salva Disponibilità
+            </button>
+          </div>
+
+          <!-- Response Message -->
+          <div id="response-msg" class="form-message mt-4"></div>
+        </form>
+      </div>
     </div>
-    <div class="mb-3">
-      <label for="date" class="form-label">Data</label>
-      <input type="date" class="form-control" id="date" required>
-    </div>
-    <div class="mb-3">
-      <label for="start-time" class="form-label">Ora Inizio</label>
-      <input type="time" class="form-control" id="start-time" required>
-    </div>
-    <div class="mb-3">
-      <label for="end-time" class="form-label">Ora Fine</label>
-      <input type="time" class="form-control" id="end-time" required>
-    </div>
-    <button type="submit" class="btn btn-success">Aggiungi</button>
-    <div id="response-msg" class="mt-3"></div>
-  </form>
-</div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container text-center">
+    <p class="copyright">CoWorkSpace &copy; <span id="current-year"></span> - Tutti i diritti riservati</p>
+  </div>
+</footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/aggiungi_disponibilita.js"></script>
+<script>
+  // Current Year in Footer
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+
+  // Recurring Options Toggle
+  document.getElementById('recurring').addEventListener('change', function() {
+    const options = document.getElementById('recurring-options');
+    options.style.display = this.checked ? 'block' : 'none';
+  });
+
+  // Load spaces dynamically (example)
+  document.addEventListener('DOMContentLoaded', function() {
+    // In a real app, you would fetch this from your API
+    const spaces = [
+      { id: 1, name: 'Ufficio Privato A' },
+      { id: 2, name: 'Ufficio Privato B' },
+      { id: 3, name: 'Sala Riunioni Grande' },
+      { id: 4, name: 'Sala Riunioni Piccola' },
+      { id: 5, name: 'Postazione Open Space' }
+    ];
+
+    const select = document.getElementById('space-id');
+    spaces.forEach(space => {
+      const option = document.createElement('option');
+      option.value = space.id;
+      option.textContent = space.name;
+      select.appendChild(option);
+    });
+
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;
+  });
+</script>
 </body>
 </html>
