@@ -408,6 +408,47 @@
         info += ' | Orario: 08:00 - 00:00';
         infoDiv.textContent = info;
     }
+
+    document.getElementById('confirm-btn').addEventListener('click', async function() {
+        if (!selectedLocation || !selectedSpace || !selectedDate) {
+            showMessage('Completa tutti i campi obbligatori', 'error');
+            return;
+        }
+
+        // Usa l’orario previsto dal tuo codice (slot unico 08:00-00:00)
+        const [startTime, endTime] = (selectedTime || '08:00-00:00')
+            .split('-')
+            .map(s => s.trim());
+
+        try {
+            const token = localStorage.getItem('jwt_token');
+            const response = await fetch('http://localhost:3000/reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    spaceId: parseInt(selectedSpace),
+                    date: selectedDate,
+                    startTime,
+                    endTime
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json(); // atteso: { id, ... }
+                // Vai al checkout con l'id della prenotazione
+                window.location.href = `checkout.html?rid=${data.id}`;
+            } else {
+                const error = await response.json().catch(()=> ({}));
+                showMessage(error.message || 'Errore nella prenotazione', 'error');
+            }
+        } catch (err) {
+            showMessage('Errore di connessione', 'error');
+        }
+    });
+
 </script>
 </body>
 </html>
