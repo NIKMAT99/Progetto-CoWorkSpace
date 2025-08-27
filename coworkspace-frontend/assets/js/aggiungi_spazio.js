@@ -1,16 +1,18 @@
+// assets/js/aggiungi_spazio.js
 $(function () {
     const token = getAuthToken();
     if (!token) return window.location.href = 'login.html';
 
-    $('#space-form').submit(function (e) {
+    $('#space-form').on('submit', function (e) {
         e.preventDefault();
 
-        const data = {
-            location_id: $('#location-id').val(),
+        const payload = {
+            location_id: Number($('#location-id').val()),
             type: $('#type').val(),
             description: $('#description').val(),
             services: $('#services').val(),
-            price: $('#price').val()
+            price: Number($('#price').val())
+            // niente 'image' per ora, il backend non lo salva
         };
 
         $.ajax({
@@ -20,9 +22,15 @@ $(function () {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            data: JSON.stringify(data),
-            success: () => $('#msg').html('<p class="text-success">Spazio creato!</p>'),
-            error: () => $('#msg').html('<p class="text-danger">Errore creazione spazio</p>')
+            data: JSON.stringify(payload),
+            success: () => {
+                $('#msg').html('<p class="text-success">Spazio creato!</p>');
+                setTimeout(() => window.location.href = 'dashboard.html', 1200);
+            },
+            error: (xhr) => {
+                const detail = (xhr.responseJSON && (xhr.responseJSON.detail || xhr.responseJSON.error)) || 'Errore creazione spazio';
+                $('#msg').html(`<p class="text-danger">${detail}</p>`);
+            }
         });
     });
 });

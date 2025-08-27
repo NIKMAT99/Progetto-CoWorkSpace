@@ -107,6 +107,7 @@
 <script>
   // Aggiorna l'anno nel footer
   document.getElementById('current-year').textContent = new Date().getFullYear();
+  //TODO: sistemare db con immagini per spaces
 
   // Mostra il nome del file selezionato
   document.getElementById('space-image').addEventListener('change', function(e) {
@@ -116,6 +117,56 @@
       label.innerHTML = `<i class="fas fa-check-circle me-2"></i>${fileName}`;
     }
   });
+
+
+  // Gestione form
+  document.getElementById('space-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = {
+          location_id: document.getElementById('location_id').value,
+          type: document.getElementById('type').value,
+          description: document.getElementById('description').value,
+          services: document.getElementById('services').value,
+          price: document.getElementById('price').value,
+          spaceimage: document.getElementById('space-image').value
+      };
+
+      try {
+          const token = localStorage.getItem('jwt_token');
+          if (!token) {
+              showMessage('Devi essere loggato per creare uno spazio', 'error');
+              return;
+          }
+
+          const response = await fetch('http://localhost:3000/spaces', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(formData)
+          });
+
+          if (response.ok) {
+              showMessage('Spazio creata con successo!', 'success');
+              setTimeout(() => {
+                  window.location.href = 'dashboard.html';
+              }, 1500);
+          } else {
+              showMessage('Errore nella creazione dello spazio', 'error');
+          }
+      } catch (error) {
+          showMessage('Errore di connessione', 'error');
+      }
+  });
+
+  function showMessage(message, type) {
+      const msgDiv = document.getElementById('msg');
+      msgDiv.textContent = message;
+      msgDiv.className = `form-message mt-4 ${type}`;
+      msgDiv.style.display = 'block';
+  }
 </script>
 </body>
 </html>
