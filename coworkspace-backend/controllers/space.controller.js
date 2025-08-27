@@ -21,3 +21,4 @@ exports.createSpace = async (req, res) => {
         res.status(500).json({ message: 'Errore creazione spazio', error: err.message });
     }
 };
+
