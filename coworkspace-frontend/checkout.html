@@ -37,43 +37,41 @@
     const rid = params.get('rid');
     const token = localStorage.getItem('jwt_token');
 
-    // Popola riepilogo
+    // Carica tutte le prenotazioni dell'utente
     async function loadReservation() {
-        if (!rid) { document.getElementById('summary').textContent = 'ID prenotazione mancante.'; return; }
+        const summary = document.getElementById('summary');
+        if (!token) { summary.textContent = 'Token mancante.'; return; }
 
-        // Prova a usare lo snapshot salvato (se presente)
-        let snap = null;
-        try { snap = JSON.parse(sessionStorage.getItem('checkout_reservation')); } catch {}
-        if (snap && String(snap.id) === String(rid)) {
-            renderSummary(snap);
-            return;
-        }
-
-        // Fallback: prendi dal backend
         try {
-            const res = await fetch(`http://localhost:3000/reservations/${rid}`, {
+            const res = await fetch('http://localhost:3000/reservations/me', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) throw 0;
-            const data = await res.json();
-            renderSummary(data);
-        } catch {
-            document.getElementById('summary').textContent = 'Impossibile caricare i dettagli.';
-        }
-    }
+            const reservations = await res.json();
 
-    function renderSummary(r) {
-        const priceCents = r.price_cents ?? (r.price ? Math.round(Number(r.price) * 100) : 0);
-        const euro = (priceCents/100).toFixed(2).replace('.', ',');
-        const rows = [
-            `<div><strong>Prenotazione #${r.id}</strong></div>`,
-            r.location_name ? `<div>Sede: ${r.location_name}</div>` : '',
-            r.space_name ? `<div>Spazio: ${r.space_name}</div>` : '',
-            r.date ? `<div>Data: ${r.date}</div>` : '',
-            (r.start_time && r.end_time) ? `<div>Orario: ${r.start_time} – ${r.end_time}</div>` : '',
-            `<div class="mt-1"><strong>Totale: € ${euro}</strong></div>`
-        ].filter(Boolean).join('');
-        document.getElementById('summary').innerHTML = rows || 'Dettagli non disponibili.';
+            if (!reservations.length) {
+                summary.textContent = 'Nessuna prenotazione trovata.';
+                return;
+            }
+
+            summary.innerHTML = reservations.map(r => {
+                const priceCents = r.price_cents ?? (r.price ? Math.round(Number(r.price) * 100) : 0);
+                const euro = (priceCents/100).toFixed(2).replace('.', ',');
+                return `
+                <div class="mb-3 border-bottom pb-2">
+                    <div><strong>Prenotazione #${r.id}</strong></div>
+                    ${r.location_name ? `<div>Sede: ${r.location_name}</div>` : ''}
+                    ${r.space_name ? `<div>Spazio: ${r.space_name}</div>` : ''}
+                    ${r.date ? `<div>Data: ${r.date}</div>` : ''}
+                    ${(r.start_time && r.end_time) ? `<div>Orario: ${r.start_time} – ${r.end_time}</div>` : ''}
+                    <div class="mt-1"><strong>Totale: € ${euro}</strong></div>
+                </div>
+            `;
+            }).join('');
+        } catch (e) {
+            summary.textContent = 'Impossibile caricare le prenotazioni.';
+            console.error(e);
+        }
     }
 
     document.getElementById('payBtn').addEventListener('click', async () => {
