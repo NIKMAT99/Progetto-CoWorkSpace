@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const allSpaces = await fetch('http://localhost:3000/spaces')
             .then(res => res.json());
 
-        const spaces = allSpaces.filter(space => space.locationId === locationId);
+        const spaces = allSpaces.filter(space => space.location_id === Number(locationId));
 
         // 6. Render spazi
         const container = document.getElementById('spaces-container');
