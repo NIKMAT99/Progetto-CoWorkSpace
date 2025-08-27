@@ -12,11 +12,6 @@ exports.createReservation = async (req, res) => {
             [req.user.id, space_id, date, start_time, end_time, 'confermata']
         );
 
-        await client.query(
-            'UPDATE availability SET is_available = false WHERE space_id = $1 AND date = $2 AND start_time = $3 AND end_time = $4',
-            [space_id, date, start_time, end_time]
-        );
-
         await client.query('COMMIT');
         res.status(201).json({ message: 'Prenotazione creata e disponibilità aggiornata' });
     } catch (err) {
@@ -43,7 +38,7 @@ exports.deleteReservation = async (req, res) => {
     try {
         // Verifica che la prenotazione appartenga all'utente
         const check = await db.query(
-            'SELECT * FROM reservation WHERE id = $1 AND user_id = $2',
+            'SELECT * FROM reservations WHERE id = $1 AND user_id = $2',
             [reservationId, userId]
         );
 
@@ -51,7 +46,7 @@ exports.deleteReservation = async (req, res) => {
             return res.status(404).json({ message: 'Prenotazione non trovata' });
         }
 
-        await db.query('DELETE FROM reservation WHERE id = $1', [reservationId]);
+        await db.query('DELETE FROM reservations WHERE id = $1', [reservationId]);
 
         res.json({ message: 'Prenotazione cancellata' });
     } catch (err) {
