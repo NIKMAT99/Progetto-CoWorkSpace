@@ -76,6 +76,138 @@
             border-color: var(--primary-color);
             background: var(--secondary-color);
         }
+        .time-selection-container {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .time-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .time-slot {
+            position: relative;
+            padding: 14px 8px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+        }
+
+        .time-slot:hover:not(.booked) {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .time-slot.booked {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .time-slot.booked:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #f5c6cb;
+        }
+
+        .time-slot.booked::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #721c24;
+            transform: rotate(-45deg);
+            opacity: 0.7;
+        }
+
+        .time-slot.time {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .time-slot.status {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .slot-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-available {
+            background: white;
+            border: 2px solid #e9ecef;
+        }
+
+        .legend-selected {
+            background: var(--primary-color);
+        }
+
+        .legend-booked {
+            background: #f8d7da;
+        }
+
+        @media (max-width: 768px) {
+            .time-slots-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            }
+
+            .time-slot {
+                padding: 10px 5px;
+                min-height: 60px;
+            }
+
+            .time-slot .time {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -132,10 +264,40 @@
 
                 <!-- Step 4: Seleziona Orario -->
                 <div class="mb-4" id="time-selection" style="display: none;">
-                    <h4 class="mb-3"><i class="fas fa-clock me-2"></i>4. Scegli l'Orario</h4>
-                    <p class="text-muted mb-3">Seleziona un orario per la tua prenotazione (08:00 - 00:00)</p>
-                    <div class="slot-grid" id="slots-grid">
-                        <!-- Slots verranno generati qui -->
+                    <div class="time-selection-container">
+                        <div class="time-header">
+                            <h4 class="mb-0"><i class="fas fa-clock me-2"></i>4. Scegli l'Orario</h4>
+                            <span class="badge bg-info" id="selected-date-badge">Data selezionata</span>
+                        </div>
+
+                        <p class="text-muted">Seleziona un orario disponibile per la tua prenotazione</p>
+
+                        <div class="time-slots-grid" id="time-slots-grid">
+                            <!-- Gli slot orari verranno generati qui -->
+                        </div>
+
+                        <div class="slot-legend">
+                            <div class="legend-item">
+                                <div class="legend-color legend-available"></div>
+                                <span>Disponibile</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-selected"></div>
+                                <span>Selezionato</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-booked"></div>
+                                <span>Prenotato</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-unavailable"></div>
+                                <span>Non disponibile</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-popular"></div>
+                                <span>Popolare</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -167,290 +329,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/prenotazione.js"></script>
-<script>
-    // Variabili globali
-    let selectedLocation = null;
-    let selectedSpace = null;
-    let selectedDate = null;
-    let selectedTime = '08:00-00:00'; // Orario fisso come da specifica
-
-    // Controllo autenticazione
-    document.addEventListener('DOMContentLoaded', function() {
-        const token = localStorage.getItem('jwt_token');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // Aggiorna anno corrente
-        document.getElementById('current-year').textContent = new Date().getFullYear();
-
-        // Imposta data minima (oggi)
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('reservation-date').min = today;
-
-        // Carica le location
-        loadLocations();
-    });
-
-    // Carica le location
-    async function loadLocations() {
-        try {
-            const response = await fetch('http://localhost:3000/locations');
-            const locations = await response.json();
-
-            const select = document.getElementById('location-select');
-            locations.forEach(loc => {
-                const option = document.createElement('option');
-                option.value = loc.id;
-                option.textContent = `${loc.name} - ${loc.city}`;
-                select.appendChild(option);
-            });
-
-        } catch (error) {
-            showMessage('Errore nel caricamento delle sedi', 'error');
-        }
-    }
-
-    // Quando cambia la sede
-    document.getElementById('location-select').addEventListener('change', async function() {
-        selectedLocation = this.value;
-        selectedSpace = null;
-        selectedDate = null;
-
-        if (!selectedLocation) {
-            hideElement('space-selection');
-            hideElement('date-selection');
-            hideElement('time-selection');
-            hideElement('confirmation');
-            return;
-        }
-
-        await loadSpaces(selectedLocation);
-        showElement('space-selection');
-        hideElement('date-selection');
-        hideElement('time-selection');
-        hideElement('confirmation');
-        updateSelectionInfo();
-    });
-
-    // Carica spazi per location
-    async function loadSpaces(locationId) {
-        try {
-            const response = await fetch('http://localhost:3000/spaces');
-            const allSpaces = await response.json();
-            const spaces = allSpaces.filter(space => space.location_id === Number(locationId));
-
-            const container = document.getElementById('spaces-container');
-            container.innerHTML = '';
-
-            if (spaces.length === 0) {
-                container.innerHTML = `
-                        <div class="col-12 text-center py-4">
-                            <i class="fas fa-door-open fa-3x text-muted mb-3"></i>
-                            <h5>Nessuno spazio disponibile</h5>
-                            <p class="text-muted">Non ci sono spazi in questa sede al momento.</p>
-                        </div>
-                    `;
-                return;
-            }
-
-            spaces.forEach(space => {
-                const spaceCard = document.createElement('div');
-                spaceCard.className = 'col-md-6';
-                spaceCard.innerHTML = `
-                        <div class="space-card" data-space-id="${space.id}">
-                            <h5>${space.type}</h5>
-                            <p class="mb-1">${space.description || 'Spazio confortevole'}</p>
-                            <p class="text-primary fw-bold">${space.price}€/ora</p>
-                            <button class="btn btn-outline-primary btn-sm select-space-btn">
-                                Seleziona
-                            </button>
-                        </div>
-                    `;
-                container.appendChild(spaceCard);
-            });
-
-            // Aggiungi event listener ai pulsanti
-            document.querySelectorAll('.select-space-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const spaceCard = this.closest('.space-card');
-                    const spaceId = spaceCard.dataset.spaceId;
-
-                    // Rimuovi selezione precedente
-                    document.querySelectorAll('.space-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-
-                    // Aggiungi selezione corrente
-                    spaceCard.classList.add('selected');
-                    selectedSpace = spaceId;
-
-                    showElement('date-selection');
-                    hideElement('time-selection');
-                    hideElement('confirmation');
-                    updateSelectionInfo();
-                });
-            });
-
-        } catch (error) {
-            showMessage('Errore nel caricamento degli spazi', 'error');
-        }
-    }
-
-    // Quando cambia la data
-    document.getElementById('reservation-date').addEventListener('change', function() {
-        selectedDate = this.value;
-
-        if (selectedDate) {
-            showElement('time-selection');
-            showElement('confirmation');
-            generateTimeSlots();
-            updateSelectionInfo();
-        } else {
-            hideElement('time-selection');
-            hideElement('confirmation');
-        }
-    });
-
-    // Genera gli slot temporali (sempre disponibili 08:00-00:00)
-    function generateTimeSlots() {
-        const slotsGrid = document.getElementById('slots-grid');
-        slotsGrid.innerHTML = '';
-
-        // Crea un unico slot per l'intera giornata (come da specifica)
-        const slotDiv = document.createElement('div');
-        slotDiv.className = 'slot-cell selected';
-        slotDiv.innerHTML = `
-                <div><strong>08:00 - 00:00</strong></div>
-                <small>Intera giornata</small>
-            `;
-
-        slotsGrid.appendChild(slotDiv);
-
-        // Abilita il pulsante di conferma
-        document.getElementById('confirm-btn').disabled = false;
-    }
-
-    // Conferma prenotazione
-    document.getElementById('confirm-btn').addEventListener('click', async function() {
-        if (!selectedLocation || !selectedSpace || !selectedDate) {
-            showMessage('Completa tutti i campi obbligatori', 'error');
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem('jwt_token');
-            const response = await fetch('http://localhost:3000/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    spaceId: parseInt(selectedSpace),
-                    date: selectedDate,
-                    startTime: '08:00',
-                    endTime: '00:00'
-                })
-            });
-
-            if (response.ok) {
-                showMessage('Prenotazione creata con successo!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            } else {
-                const error = await response.json();
-                showMessage(error.message || 'Errore nella prenotazione', 'error');
-            }
-
-        } catch (error) {
-            showMessage('Errore di connessione', 'error');
-        }
-    });
-
-    // Funzioni di utilità
-    function showElement(id) {
-        document.getElementById(id).style.display = 'block';
-    }
-
-    function hideElement(id) {
-        document.getElementById(id).style.display = 'none';
-    }
-
-    function showMessage(message, type) {
-        const msgDiv = document.getElementById('booking-message');
-        msgDiv.textContent = message;
-        msgDiv.className = `form-message mt-4 ${type}`;
-        msgDiv.style.display = 'block';
-    }
-
-    function updateSelectionInfo() {
-        const infoDiv = document.getElementById('selected-info');
-        let info = '';
-
-        if (selectedLocation) {
-            const locationSelect = document.getElementById('location-select');
-            const locationName = locationSelect.options[locationSelect.selectedIndex].text;
-            info += `Sede: ${locationName}`;
-        }
-
-        if (selectedSpace) {
-            const spaceCard = document.querySelector(`[data-space-id="${selectedSpace}"]`);
-            const spaceName = spaceCard.querySelector('h5').textContent;
-            info += ` | Spazio: ${spaceName}`;
-        }
-
-        if (selectedDate) {
-            info += ` | Data: ${new Date(selectedDate).toLocaleDateString('it-IT')}`;
-        }
-
-        info += ' | Orario: 08:00 - 00:00';
-        infoDiv.textContent = info;
-    }
-
-    document.getElementById('confirm-btn').addEventListener('click', async function() {
-        if (!selectedLocation || !selectedSpace || !selectedDate) {
-            showMessage('Completa tutti i campi obbligatori', 'error');
-            return;
-        }
-
-        // Usa l’orario previsto dal tuo codice (slot unico 08:00-00:00)
-        const [startTime, endTime] = (selectedTime || '08:00-00:00')
-            .split('-')
-            .map(s => s.trim());
-
-        try {
-            const token = localStorage.getItem('jwt_token');
-            const response = await fetch('http://localhost:3000/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    spaceId: parseInt(selectedSpace),
-                    date: selectedDate,
-                    startTime,
-                    endTime
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json(); // atteso: { id, ... }
-                // Vai al checkout con l'id della prenotazione
-                window.location.href = `checkout.html?rid=${data.id}`;
-            } else {
-                const error = await response.json().catch(()=> ({}));
-                showMessage(error.message || 'Errore nella prenotazione', 'error');
-            }
-        } catch (err) {
-            showMessage('Errore di connessione', 'error');
-        }
-    });
-
-
-</script>
 </body>
 </html>
