@@ -4,17 +4,21 @@ $(document).ready(function () {
         container.empty();
 
         data.forEach(loc => {
+            const imgTag = loc.image_url
+                ? `<img class="card-img-top" src="${loc.image_url}" alt="${loc.name}">`
+                : '';
+
             const card = `
-        <div class="col">
-          <div class="card h-100 shadow">
-            <div class="card-body">
-              <h5 class="card-title">${loc.name}</h5>
-              <p class="card-text">${loc.address}</p>
-              <p class="text-muted">${loc.city}</p>
-            </div>
-          </div>
-        </div>
-      `;
+                  <div class="col">
+                    <div class="card h-100 shadow">
+                      ${imgTag}  <!-- << solo se c'è -->
+                      <div class="card-body">
+                        <h5 class="card-title">${loc.name}</h5>
+                        <p class="card-text">${loc.address}</p>
+                        <p class="text-muted">${loc.city}</p>
+                      </div>
+                    </div>
+                  </div>`;
             container.append(card);
         });
     }).fail(function () {

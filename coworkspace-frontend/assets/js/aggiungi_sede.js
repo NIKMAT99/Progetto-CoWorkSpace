@@ -10,6 +10,19 @@ document.getElementById('location-image').addEventListener('change', function(e)
     }
 });
 
+async function uploadImageIfAny(fileInputEl) {
+    if (!fileInputEl || !fileInputEl.files || fileInputEl.files.length === 0) return null;
+    const fd = new FormData();
+    fd.append('image', fileInputEl.files[0]); // il field name DEVE essere "image"
+    const upRes = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        body: fd
+    });
+    if (!upRes.ok) throw new Error('Upload immagine fallito');
+    const { url } = await upRes.json();
+    return url || null;
+}
+
 // Gestione form
 document.getElementById('location-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -18,8 +31,10 @@ document.getElementById('location-form').addEventListener('submit', async functi
         name: document.getElementById('name').value,
         city: document.getElementById('city').value,
         address: document.getElementById('address').value,
-        description: document.getElementById('description').value
+        description: document.getElementById('description').value,
     };
+
+    const fileInputEl = document.getElementById('location-image');
 
     try {
         const token = localStorage.getItem('jwt_token');
@@ -28,13 +43,30 @@ document.getElementById('location-form').addEventListener('submit', async functi
             return;
         }
 
+        let image_url = null;
+        try{
+            image_url = await uploadImageIfAny(fileInputEl);
+        }catch (err) {
+            console.error(err);
+            showMessage('caricamento immagine fallito', 'error');
+            return;
+        }
+
+        const payload = {
+            name: formData.name,
+            city: formData.city,
+            address: formData.address,
+            description: formData.description
+        };
+        if (image_url) payload.image_url = image_url;
+
         const response = await fetch('http://localhost:3000/locations', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(payload)
         });
 
         if (response.ok) {
@@ -43,7 +75,12 @@ document.getElementById('location-form').addEventListener('submit', async functi
                 window.location.href = 'dashboard.html';
             }, 1500);
         } else {
-            showMessage('Errore nella creazione della sede', 'error');
+            let msg = 'Errore nella creazione della sede';
+            try {
+                const errJson = await response.json();
+                if (errJson && errJson.message) msg = errJson.message;
+            } catch (_) {}
+            showMessage(msg, 'error');
         }
     } catch (error) {
         showMessage('Errore di connessione', 'error');
