@@ -22,9 +22,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('address').textContent = `${location.address}, ${location.city}`;
 
         // 3. Aggiorna immagine
-        document.getElementById('main-image').src = `assets/img/locations/${location.id}.jpg`;
-        document.getElementById('main-image').alt = location.name;
-
+        //document.getElementById('main-image').src = `assets/img/locations/${location.id}.jpg`;
+        //document.getElementById('main-image').alt = location.name;
+        const mainImageEl = document.getElementById('main-image');
+        // usa SOLO l'immagine dal DB; se manca, nascondi l'img (niente fallback a assets/)
+        if (location.image_url) {
+            mainImageEl.src = location.image_url;
+            mainImageEl.alt = location.name;
+        } else {
+            mainImageEl.classList.add('d-none');
+        }
         // 4. Aggiorna descrizione
         document.getElementById('location-description').textContent =
             location.description || 'Questa sede offre spazi di coworking moderni e ben attrezzati, ideali per professionisti e team.';
@@ -35,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         const spaces = allSpaces.filter(space => space.location_id === Number(locationId));
 
-        // 6. Render spazi
+        // 6.Render spazi
         const container = document.getElementById('spaces-container');
         if (spaces.length === 0) {
             container.innerHTML = `
@@ -46,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                         </div>
                     `;
         } else {
-            container.innerHTML = spaces.map(space => `
+            /*container.innerHTML = spaces.map(space => `
                         <div class="col-md-6">
                             <div class="card h-100">
                                 <img src="assets/img/spaces/${space.id}.jpg" class="card-img-top" alt="${space.type}" style="height: 200px; object-fit: cover;">
@@ -57,14 +64,31 @@ document.addEventListener('DOMContentLoaded', async function() {
                                 </div>
                             </div>
                         </div>
-                    `).join('');
+            `).join('');*/
+            container.innerHTML = spaces.map(space => {
+                // usa SOLO image_url dal DB; se manca, NIENTE <img>
+                const spaceImg = space.image_url
+                    ? `<img src="${space.image_url}" class="card-img-top" alt="${space.type}" style="height: 200px; object-fit: cover;">`
+                    : '';
 
-            // Popola dropdown prenotazione
-            const bookingSelect = document.getElementById('booking-space');
-            bookingSelect.innerHTML = spaces.map(space =>
-                `<option value="${space.id}">${space.name} - ${space.price}€/ora</option>`
-            ).join('');
+                return `
+                    <div class="col-md-6">
+                      <div class="card h-100">
+                        ${spaceImg} <!-- << immagine solo se c'è -->
+                        <div class="card-body">
+                          <h5 class="card-title">${space.type}</h5>
+                          <p class="card-text">${space.description || 'Spazio confortevole e ben attrezzato'}</p>
+                          <p class="text-primary fw-bold">${Number(space.price).toFixed(2)}€/ora</p>
+                        </div>
+                      </div>
+                    </div>`;
+            }).join('');
         }
+        // Popola dropdown prenotazione
+        const bookingSelect = document.getElementById('booking-space');
+        bookingSelect.innerHTML = spaces.map(space =>
+            `<option value="${space.id}">${space.type} - ${space.price}€/ora</option>`
+        ).join('');
 
         // 7. Gestione autenticazione
         const token = localStorage.getItem('jwt_token');
