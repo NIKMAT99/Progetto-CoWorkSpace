@@ -28,7 +28,7 @@
           <i class="fas fa-building form-icon"></i>Aggiungi Nuova Sede
         </h2>
 
-        <form id="location-form" enctype="multipart/form-data">
+        <form id="location-form">
           <div class="mb-4">
             <label for="name" class="form-label">Nome della Sede</label>
             <div class="input-group">
@@ -63,10 +63,10 @@
 
           <div class="mb-4">
             <label for="location-image" class="form-label">Immagine della Sede</label>
-            <div class="file-upload">
-              <label class="file-upload-label">
-                <i class="fas fa-cloud-upload-alt me-2"></i>Scegli un'immagine rappresentativa
-                <input type="file" id="location-image" class="file-upload-input" accept="image/*">
+            <div class="file-upload position-relative">
+              <label class="file-upload-label btn btn-outline-primary w-100 text-center">
+                <i class="fas fa-cloud-upload-alt me-2"></i> Scegli un'immagine
+                <input type="file" id="location-image" name="cover_image_url" class="file-upload-input" accept="image/*">
               </label>
             </div>
             <small class="text-muted">Formati accettati: JPG, PNG. Dimensione massima: 5MB</small>

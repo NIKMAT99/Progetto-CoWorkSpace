@@ -1,76 +1,68 @@
-// Aggiorna l'anno corrente solo se l'elemento esiste
 document.addEventListener('DOMContentLoaded', function() {
-    const currentYearEl = document.getElementById('current-year');
-    if (currentYearEl) {
-        currentYearEl.textContent = new Date().getFullYear();
-    }
-
-    // Verifica se l'elemento file input esiste prima di aggiungere l'event listener
-    const fileInput = document.getElementById('location-image');
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            if (this.files.length > 0) {
-                const fileName = this.files[0].name;
-                const label = this.closest('.file-upload').querySelector('.file-upload-label');
-                if (label) {
-                    label.innerHTML = `<i class="fas fa-check-circle me-2"></i>${fileName}`;
-                }
-            }
-        });
-    }
-
-    // Gestione form
-    const locationForm = document.getElementById('location-form');
-    if (locationForm) {
-        locationForm.addEventListener('submit', handleFormSubmit);
+    // Assicurati che l'utente sia un admin prima di fare qualsiasi cos
+    const form = document.getElementById('location-form');
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+    } else {
+        console.error("Elemento form 'location-form' non trovato.");
     }
 });
 
-async function uploadImageIfAny(fileInputEl) {
-    if (!fileInputEl || !fileInputEl.files || fileInputEl.files.length === 0) {
-        console.log('Nessun file selezionato per l\'upload');
-        return null;
+/**
+ * Funzione per mostrare messaggi di feedback all'utente.
+ * @param {string} message - Il messaggio da mostrare.
+ * @param {'success' | 'error'} type - Il tipo di messaggio.
+ */
+function showMessage(message, type) {
+    const msgElement = document.getElementById('msg');
+    if (msgElement) {
+        msgElement.textContent = message;
+        msgElement.className = `form-message mt-4 alert alert-${type === 'success' ? 'success' : 'danger'}`;
+    }
+}
+
+/**
+ * Carica un'immagine se è stata selezionata in un input file.
+ * @param {HTMLInputElement} fileInput - L'elemento input di tipo file.
+ * @returns {Promise<string|null>} L'URL dell'immagine caricata o null.
+ */
+async function uploadImageIfAny(fileInput) {
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        console.log("Nessun file immagine selezionato per l'upload.");
+        return null; // Nessun file da caricare
     }
 
-    console.log('File selezionato:', fileInputEl.files[0].name, 'Tipo:', fileInputEl.files[0].type, 'Dimensione:', fileInputEl.files[0].size);
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    // La chiave 'image' deve corrispondere a quella attesa dal middleware Multer nel backend
+    formData.append('cover_image_url', file);
 
-    // Controllo dimensione file (max 5MB)
-    if (fileInputEl.files[0].size > 5 * 1024 * 1024) {
-        throw new Error('Il file è troppo grande. Dimensione massima: 5MB');
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+        throw new Error("Token di autenticazione non trovato per l'upload dell'immagine.");
     }
-
-    const fd = new FormData();
-    fd.append('cover_image_url', fileInputEl.files[0]);
 
     try {
-        const token = localStorage.getItem('jwt_token');
-        if (!token) {
-            throw new Error('Token di autenticazione non trovato');
-        }
-
-        const upRes = await fetch('http://localhost:3000/upload', {
+        const response = await fetch('http://localhost:3000/upload', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
             },
-            body: fd
+            body: formData
         });
 
-        console.log('Status upload:', upRes.status);
-
-        if (!upRes.ok) {
-            const errorText = await upRes.text();
-            console.error('Errore upload:', errorText);
-            throw new Error(`Upload fallito: ${errorText}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Errore durante il caricamento del file.');
         }
 
-        const result = await upRes.json();
-        console.log('Risposta upload:', result);
+        const result = await response.json();
+        // Assumendo che il backend risponda con { imageUrl: 'path/to/image.jpg' }
+        return result.url;
 
-        return result.url || null;
     } catch (error) {
-        console.error('Errore completo upload:', error);
-        throw error;
+        console.error("Errore nella funzione di upload:", error);
+        throw error; // Rilancia l'errore per gestirlo nel chiamante
     }
 }
 
@@ -88,7 +80,8 @@ async function handleFormSubmit(e) {
         // 1. Upload immagine (se presente)
         let cover_image_url = null;
         try {
-            cover_image_url = await uploadImageIfAny(document.getElementById('location-image'));
+            const fileInput = document.getElementById('location-image');
+            cover_image_url = await uploadImageIfAny(fileInput);
             console.log('URL immagine ottenuto:', cover_image_url);
         } catch (error) {
             console.error('Errore upload immagine:', error);
@@ -105,12 +98,6 @@ async function handleFormSubmit(e) {
             address: document.getElementById('address').value,
             cover_image_url: cover_image_url
         };
-
-        // Aggiungi descrizione se presente
-        const description = document.getElementById('description').value;
-        if (description) {
-            payload.description = description;
-        }
 
         console.log('Payload completo:', payload);
 
@@ -138,11 +125,11 @@ async function handleFormSubmit(e) {
 
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 1500);
+            }, 15000); // Ridotto il timeout per un reindirizzamento più rapido
         } else {
-            const errorText = await response.text();
-            console.error('Errore backend:', errorText);
-            showMessage('Errore nella creazione della sede: ' + errorText, 'error');
+            const errorData = await response.json();
+            console.error('Errore backend:', errorData);
+            showMessage('Errore nella creazione della sede: ' + (errorData.message || 'Errore sconosciuto'), 'error');
         }
     } catch (error) {
         console.error('Errore di connessione:', error);
@@ -151,17 +138,5 @@ async function handleFormSubmit(e) {
         // Riabilita il bottone
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-    }
-}
-
-function showMessage(message, type) {
-    const msgDiv = document.getElementById('msg');
-    if (msgDiv) {
-        msgDiv.textContent = message;
-        msgDiv.className = `form-message mt-4 ${type}`;
-        msgDiv.style.display = 'block';
-
-        // Scrolla fino al messaggio
-        msgDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }

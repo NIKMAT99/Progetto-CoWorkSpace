@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// field name DEVE essere "image" (coerente con il JS)
+
 router.post('/', upload.single('cover_image_url'), (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'Nessun file caricato' });
     const url = `http://localhost:${process.env.PORT || 3000}/uploads/${req.file.filename}`;
