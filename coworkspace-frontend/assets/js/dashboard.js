@@ -8,7 +8,7 @@ $(document).ready(function () {
 
     // Recupero profilo utente
     $.ajax({
-        url: '${window.API_BASE_URL}/users/me',
+        url: `${window.API_BASE_URL}/users/me`,
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -30,7 +30,7 @@ $(document).ready(function () {
 
     // Recupero prenotazioni utente
     $.ajax({
-        url: '${window.API_BASE_URL}/reservations/me',
+        url: `${window.API_BASE_URL}/reservations/me`,
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -68,7 +68,7 @@ $(document).ready(function () {
     });
     function loadReservations() {
         $.ajax({
-            url: '${window.API_BASE_URL}/reservations/me',
+            url: `${window.API_BASE_URL}/reservations/me`,
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
             success: function (reservations) {
