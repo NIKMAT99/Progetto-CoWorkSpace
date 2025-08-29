@@ -1,5 +1,6 @@
 $(document).ready(function () {
-    $.get('https://progetto-coworkspace.onrender.com/locations', function (data) {
+    const {API_URL} = require('./config');
+    $.get(`${API_URL}/locations`, function (data) {
         const container = $('#location-gallery'); // Cambiato da #location-list a #location-gallery
         container.empty();
 
