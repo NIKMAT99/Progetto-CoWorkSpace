@@ -2,3 +2,15 @@ ALTER TABLE public.locations
     ADD COLUMN IF NOT EXISTS cover_image_url text;
 ALTER TABLE public.spaces
     ADD COLUMN IF NOT EXISTS cover_image_url text;
+
+
+//per pagamento
+
+ALTER TABLE reservations
+ADD COLUMN IF NOT EXISTS paid BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE reservations
+ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP NULL;
+
+CREATE INDEX IF NOT EXISTS idx_reservations_user_paid
+ON reservations (user_id, paid);

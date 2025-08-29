@@ -12,6 +12,7 @@ const reservationRoutes = require('./routes/reservation.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const locationRoutes = require('./routes/location.routes');
 const uploadRoutes = require('./routes/upload.routes');
+const cartRoutes = require('./routes/cart.routes');
 
 dotenv.config();
 const app = express();
@@ -37,6 +38,7 @@ app.use('/reservations', reservationRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/locations', locationRoutes);
 app.use('/upload', uploadRoutes);
+app.use('/cart', cartRoutes);
 
 app.get('/', (req, res) => {
     res.send('CoWorkSpace API attiva');

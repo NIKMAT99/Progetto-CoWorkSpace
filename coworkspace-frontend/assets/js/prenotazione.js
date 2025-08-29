@@ -344,7 +344,8 @@ document.getElementById('confirm-btn').addEventListener('click', async function(
 
         if (response.ok) {
             showMessage('Prenotazione creata con successo!', 'success');
-
+            alert('Prenotazione creata. Aggiunta al carrello (non pagata).');
+            if (typeof refreshCartBadge === 'function') await refreshCartBadge();
             // Aggiorna la lista delle prenotazioni
             const newReservation = await response.json();
             existingReservations.push(newReservation);
