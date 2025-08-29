@@ -1,4 +1,5 @@
 $(function () {
+
     const token = getAuthToken();
     if (!token) return window.location.href = 'login.html';
 
@@ -13,7 +14,7 @@ $(function () {
         };
 
         $.ajax({
-            url: 'http://localhost:3000/availability/reset',
+            url: `${window.API_BASE_URL}/availability/reset`,
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${token}`,
