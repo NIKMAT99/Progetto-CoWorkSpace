@@ -8,7 +8,7 @@ $(document).ready(function () {
 
     // Recupero profilo utente
     $.ajax({
-        url: 'http://localhost:3000/users/me',
+        url: '${window.API_BASE_URL}/users/me',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -30,7 +30,7 @@ $(document).ready(function () {
 
     // Recupero prenotazioni utente
     $.ajax({
-        url: 'http://localhost:3000/reservations/me',
+        url: '${window.API_BASE_URL}/reservations/me',
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`
@@ -68,7 +68,7 @@ $(document).ready(function () {
     });
     function loadReservations() {
         $.ajax({
-            url: 'http://localhost:3000/reservations/me',
+            url: '${window.API_BASE_URL}/reservations/me',
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
             success: function (reservations) {
@@ -90,7 +90,7 @@ $(document).ready(function () {
                     row.find('button').click(function () {
                         if (confirm('Sei sicuro di voler cancellare questa prenotazione?')) {
                             $.ajax({
-                                url: `http://localhost:3000/reservations/${r.id}`,
+                                url: `${window.API_BASE_URL}/reservations/${r.id}`,
                                 method: 'DELETE',
                                 headers: { Authorization: `Bearer ${token}` },
                                 success: function () {
