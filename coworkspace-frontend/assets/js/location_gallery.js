@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $.get('http://localhost:3000/locations', function (data) {
+    $.get(`${window.API_URL}/locations`, function (data) {
         const container = $('#location-gallery');
         container.empty();
 

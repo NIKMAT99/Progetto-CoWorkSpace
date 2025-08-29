@@ -13,7 +13,7 @@ $(document).ready(function () {
         };
 
         $.ajax({
-            url: 'http://localhost:3000/availability',
+            url: `${window.API_URL}/availability`,
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`,

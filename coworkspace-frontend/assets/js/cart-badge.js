@@ -1,5 +1,4 @@
-// assets/js/cart-badge.js
-const API_BASE = 'http://localhost:3000';
+
 
 window.updateCartBadge = function (count) {
     const badge = document.getElementById('cart-badge');
@@ -26,7 +25,7 @@ window.refreshCartBadge = async function () {
     }
 
     try {
-        const res = await fetch(`${API_BASE}/cart`, {
+        const res = await fetch(`${window.API_URL}/cart`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);

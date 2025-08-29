@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadExistingReservations() {
     try {
         const token = localStorage.getItem('jwt_token');
-        const response = await fetch('http://localhost:3000/reservations', {
+        const response = await fetch(`${window.API_URL}/reservations`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -47,7 +47,7 @@ async function loadExistingReservations() {
 async function refreshReservations() {
     try {
         const token = localStorage.getItem('jwt_token');
-        const response = await fetch('http://localhost:3000/reservations', {
+        const response = await fetch(`${window.API_URL}/reservations`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -61,7 +61,7 @@ async function refreshReservations() {
 // Carica le location
 async function loadLocations() {
     try {
-        const response = await fetch('http://localhost:3000/locations');
+        const response = await fetch(`${window.API_URL}/locations`);
         const locations = await response.json();
 
         const select = document.getElementById('location-select');
@@ -106,7 +106,7 @@ document.getElementById('location-select').addEventListener('change', async func
 // Carica spazi per location
 async function loadSpaces(locationId) {
     try {
-        const response = await fetch('http://localhost:3000/spaces');
+        const response = await fetch(`${window.API_URL}/spaces`);
         const allSpacesData = await response.json();
         const spaces = allSpacesData.filter(space => space.location_id === Number(locationId));
 
@@ -193,7 +193,7 @@ document.getElementById('reservation-date').addEventListener('change', async fun
 async function loadSpaceReservations(spaceId, date) {
     try {
         const response = await fetch(
-            `http://localhost:3000/availability/getSpaceReservations?space_id=${spaceId}&start_date=${date}&end_date=${date}`
+            `${window.API_URL}/availability/getSpaceReservations?space_id=${spaceId}&start_date=${date}&end_date=${date}`
         );
         if (response.ok) {
             const data = await response.json();
@@ -211,7 +211,7 @@ async function loadAvailableSlots() {
 
     try {
         // Recupera gli slot disponibili
-        const response = await fetch(`http://localhost:3000/availability/slots?space_id=${selectedSpace}&date=${selectedDate}`);
+        const response = await fetch(`${window.API_URL}/availability/slots?space_id=${selectedSpace}&date=${selectedDate}`);
         // Recupera le prenotazioni esistenti per lo spazio e la data
         const reservations = await loadSpaceReservations(selectedSpace, selectedDate);
 
@@ -296,7 +296,7 @@ async function checkAvailabilityBeforeBooking() {
 
         // Controlla anche nella lista delle prenotazioni esistenti
         const response = await fetch(
-            `http://localhost:3000/availability/check?space_id=${selectedSpace}&date=${selectedDate}&start_time=${selectedStartTime}&end_time=${selectedEndTime}`
+            `${window.API_URL}/availability/check?space_id=${selectedSpace}&date=${selectedDate}&start_time=${selectedStartTime}&end_time=${selectedEndTime}`
         );
 
         if (response.ok) {
@@ -328,7 +328,7 @@ document.getElementById('confirm-btn').addEventListener('click', async function(
 
     try {
         const token = localStorage.getItem('jwt_token');
-        const response = await fetch('http://localhost:3000/reservations', {
+        const response = await fetch(`${window.API_URL}/reservations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     try {
         // 1. Carica la location specifica
-        const location = await fetch(`http://localhost:3000/locations/${locationId}`)
+        const location = await fetch(`${window.API_URL}/locations/${locationId}`)
             .then(res => res.json());
 
         // 2. Aggiorna header
@@ -24,16 +24,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         // 3. Aggiorna immagine
         const mainImageEl = document.getElementById('main-image');
         if (location.cover_image_url) {
-            // Ricostruisci l'URL completo
             let imageUrl = location.cover_image_url;
 
-            // Se è un percorso relativo senza il dominio
             if (!imageUrl.startsWith('http')) {
-                // Se inizia già con uploads/, usa così, altrimenti aggiungi uploads/
                 if (!imageUrl.startsWith('uploads/')) {
                     imageUrl = `uploads/${imageUrl}`;
                 }
-                imageUrl = `http://localhost:3000/${imageUrl}`;
+                imageUrl = `${window.API_URL}/${imageUrl}`;
             }
 
             mainImageEl.src = imageUrl;
@@ -54,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             location.description || 'Questa sede offre spazi di coworking moderni e ben attrezzati, ideali per professionisti e team.';
 
         // 5. Carica TUTTI gli spazi e filtra per locationId
-        const allSpaces = await fetch('http://localhost:3000/spaces')
+        const allSpaces = await fetch(`${window.API_URL}/spaces`)
             .then(res => res.json());
 
         const spaces = allSpaces.filter(space => space.location_id === Number(locationId));

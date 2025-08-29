@@ -43,7 +43,7 @@ async function uploadImageIfAny(fileInput) {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/upload', {
+        const response = await fetch(`${window.API_URL}/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -107,7 +107,7 @@ async function handleFormSubmit(e) {
             throw new Error('Token di autenticazione non trovato');
         }
 
-        const response = await fetch('http://localhost:3000/locations', {
+        const response = await fetch(`${window.API_URL}/locations`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

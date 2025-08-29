@@ -5,7 +5,7 @@ $('#login-form').on('submit', function (e) {
     const password = $('#password').val();
 
     $.ajax({
-        url: 'http://localhost:3000/auth/login',
+        url: `${window.API_URL}/auth/login`,
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ email, password }),

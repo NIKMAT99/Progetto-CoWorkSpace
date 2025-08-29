@@ -1,5 +1,4 @@
 $(async function () {
-    const API = 'http://localhost:3000';
     const token = getAuthToken();
     if (!token) return window.location.href = 'login.html';
 
@@ -9,7 +8,7 @@ $(async function () {
 
     async function loadCart() {
         try {
-            const res = await fetch(`${API}/cart`, {
+            const res = await fetch(`${window.API_URL}/cart`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -63,7 +62,7 @@ $(async function () {
         if (!ok) return;
 
         try {
-            const res = await fetch(`${API}/cart/checkout`, {
+            const res = await fetch(`${window.API_URL}/cart/checkout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -20,9 +20,9 @@ $(function () {
                 const fd = new FormData();
                 fd.append('image', fileInput.files[0]); // il field name DEVE essere "image"
 
-                // chiamata a /upload che restituisce { url: 'http://localhost:3000/uploads/...' }
+
                 const uploadRes = await $.ajax({
-                    url: 'http://localhost:3000/upload',
+                    url: `${window.API_URL}/upload`,
                     method: 'POST',
                     data: fd,
                     processData: false,   // [AGGIUNTA] necessario per FormData
@@ -42,7 +42,7 @@ $(function () {
 
 
         $.ajax({
-            url: 'http://localhost:3000/spaces',
+            url: `${window.API_URL}/spaces`,
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`,

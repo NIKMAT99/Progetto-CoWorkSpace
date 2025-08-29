@@ -14,7 +14,7 @@ $(function () {
         };
 
         $.ajax({
-            url: `${window.API_BASE_URL}/availability/reset`,
+            url: `${window.API_URL}/availability/reset`,
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${token}`,
