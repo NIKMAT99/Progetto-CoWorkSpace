@@ -1,6 +1,7 @@
 $(document).ready(function () {
-    const {API_URL} = require('./config');
-    $.get(`${API_URL}/locations`, function (data) {
+
+
+    $.get(`${window.API_URL}/locations`, function (data) {
         const container = $('#location-gallery'); // Cambiato da #location-list a #location-gallery
         container.empty();
 
