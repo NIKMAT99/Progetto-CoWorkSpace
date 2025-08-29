@@ -10,11 +10,11 @@ exports.getLocations = async (req, res) => {
 };
 
 exports.createLocation = async (req, res) => {
-    const { city, address, name, image_url = null } = req.body;
+    const { city, address, name, cover_image_url = null } = req.body;
     try {
         await pool.query(
-            'INSERT INTO locations (city, address, name, image_url) VALUES ($1, $2, $3, $4)',
-            [city, address, name, image_url]
+            'INSERT INTO locations (city, address, name, cover_image_url) VALUES ($1, $2, $3, $4)',
+            [city, address, name, cover_image_url]
         );
         res.status(201).json({ message: 'Sede creata' });
     } catch (err) {

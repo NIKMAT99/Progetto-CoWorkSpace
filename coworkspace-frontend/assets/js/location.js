@@ -22,15 +22,32 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('address').textContent = `${location.address}, ${location.city}`;
 
         // 3. Aggiorna immagine
-        //document.getElementById('main-image').src = `assets/img/locations/${location.id}.jpg`;
-        //document.getElementById('main-image').alt = location.name;
         const mainImageEl = document.getElementById('main-image');
-        // usa SOLO l'immagine dal DB; se manca, nascondi l'img (niente fallback a assets/)
-        if (location.image_url) {
-            mainImageEl.src = location.image_url;
+        if (location.cover_image_url) {
+            // Ricostruisci l'URL completo
+            let imageUrl = location.cover_image_url;
+
+            // Se è un percorso relativo senza il dominio
+            if (!imageUrl.startsWith('http')) {
+                // Se inizia già con uploads/, usa così, altrimenti aggiungi uploads/
+                if (!imageUrl.startsWith('uploads/')) {
+                    imageUrl = `uploads/${imageUrl}`;
+                }
+                imageUrl = `http://localhost:3000/${imageUrl}`;
+            }
+
+            mainImageEl.src = imageUrl;
             mainImageEl.alt = location.name;
+            mainImageEl.classList.remove('d-none');
+
+            // Gestione errori di caricamento immagine
+            mainImageEl.onerror = function() {
+                console.error("Errore nel caricamento dell'immagine:", imageUrl);
+                mainImageEl.classList.add('d-none');
+            };
         } else {
             mainImageEl.classList.add('d-none');
+            console.log("Nessuna immagine disponibile per questa location");
         }
         // 4. Aggiorna descrizione
         document.getElementById('location-description').textContent =
