@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $.get(`${window.API_BASE_URL}/locations`, function (data) {
+    $.get('https://progetto-coworkspace.onrender.com/locations', function (data) {
         const container = $('#location-gallery'); // Cambiato da #location-list a #location-gallery
         container.empty();
 
