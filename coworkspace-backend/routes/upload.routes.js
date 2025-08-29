@@ -17,7 +17,7 @@ const upload = multer({ storage });
 
 router.post('/', upload.single('cover_image_url'), (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'Nessun file caricato' });
-    const url = `http://localhost:${process.env.PORT || 3000}/uploads/${req.file.filename}`;
+    const url = `https://progetto-coworkspace.onrender.com/uploads/${req.file.filename}`;
     res.json({ url });
 });
 
