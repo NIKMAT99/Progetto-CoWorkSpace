@@ -37,7 +37,7 @@ exports.deleteReservation = async (req, res) => {
 
     try {
         // Verifica che la prenotazione appartenga all'utente
-        const check = await db.query(
+        const check = await pool.query(
             'SELECT * FROM reservations WHERE id = $1 AND user_id = $2',
             [reservationId, userId]
         );
@@ -46,7 +46,7 @@ exports.deleteReservation = async (req, res) => {
             return res.status(404).json({ message: 'Prenotazione non trovata' });
         }
 
-        await db.query('DELETE FROM reservations WHERE id = $1', [reservationId]);
+        await pool.query('DELETE FROM reservations WHERE id = $1', [reservationId]);
 
         res.json({ message: 'Prenotazione cancellata' });
     } catch (err) {

@@ -1,8 +1,8 @@
 const { Pool } = require("pg");
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false } // obbligatorio su Render
+    connectionString: process.env.DATABASE_URL || "postgres://postgres:Nikmat99@localhost:5432/CoWorkSpace",
+    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 
 // Test connessione

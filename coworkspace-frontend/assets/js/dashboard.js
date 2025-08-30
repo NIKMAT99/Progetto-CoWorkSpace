@@ -28,39 +28,6 @@ $(document).ready(function () {
         }
     });
 
-    // Recupero prenotazioni utente
-    $.ajax({
-        url: `${window.API_URL}/reservations/me`,
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
-        success: function (data) {
-            const container = $('#reservation-list');
-            container.empty();
-
-            if (data.length === 0) {
-                container.html('<p>Nessuna prenotazione trovata.</p>');
-            } else {
-                data.forEach(r => {
-                    container.append(`
-            <div class="card mb-3">
-              <div class="card-body">
-                <strong>Spazio:</strong> ${r.space_id} <br>
-                <strong>Data:</strong> ${r.date} <br>
-                <strong>Ora:</strong> ${r.start_time} - ${r.end_time} <br>
-                <strong>Stato:</strong> ${r.status}
-              </div>
-            </div>
-          `);
-                });
-            }
-        },
-        error: function () {
-            $('#reservation-list').html('<p class="text-danger">Errore nel recupero delle prenotazioni.</p>');
-        }
-    });
-
     // Logout
     $('#logout-btn').click(function () {
         localStorage.removeItem('jwt_token');
@@ -72,40 +39,57 @@ $(document).ready(function () {
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
             success: function (reservations) {
-                const tbody = $('#reservation-list');
-                tbody.empty();
+                const container = $('#reservation-list');
+                container.empty();
+
+                if (reservations.length === 0) {
+                    container.html('<p>Nessuna prenotazione trovata.</p>');
+                    return;
+                }
 
                 reservations.forEach(r => {
-                    const row = $(`
-          <tr>
-            <td>${r.space_type}</td>
-            <td>${r.date}</td>
-            <td>${r.start_time} - ${r.end_time}</td>
-            <td>
-              <button class="btn btn-danger btn-sm" data-id="${r.id}">❌ Cancella</button>
-            </td>
-          </tr>
-        `);
+                    const card = $(`
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>Spazio:</strong> ${r.space_type || r.space_id} <br>
+                                        <strong>Data:</strong> ${new Date(r.date).toLocaleDateString('it-IT')} <br>
+                                        <strong>Ora:</strong> ${r.start_time} - ${r.end_time} <br>
+                                        <strong>Stato:</strong> <span class="badge bg-info">${r.status}</span>
+                                    </div>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-id="${r.id}" title="Cancella prenotazione">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `);
 
-                    row.find('button').click(function () {
+                    card.find('.delete-btn').click(function () {
+                        const reservationId = $(this).data('id');
                         if (confirm('Sei sicuro di voler cancellare questa prenotazione?')) {
                             $.ajax({
-                                url: `${window.API_URL}/reservations/${r.id}`,
+                                url: `${window.API_URL}/reservations/${reservationId}`,
                                 method: 'DELETE',
                                 headers: { Authorization: `Bearer ${token}` },
                                 success: function () {
-                                    alert('Prenotazione cancellata');
-                                    loadReservations(); // ricarica lista
+                                    alert('Prenotazione cancellata con successo.');
+                                    loadReservations(); // Ricarica la lista
                                 },
-                                error: function () {
-                                    alert('Errore nella cancellazione');
+                                error: function (err) {
+                                    const errorMsg = err.responseJSON ? err.responseJSON.message : 'Errore nella cancellazione della prenotazione.';
+                                    alert(errorMsg);
                                 }
                             });
                         }
                     });
 
-                    tbody.append(row);
+                    container.append(card);
                 });
+            },
+            error: function () {
+                $('#reservation-list').html('<p class="text-danger">Errore nel recupero delle prenotazioni.</p>');
             }
         });
     }
