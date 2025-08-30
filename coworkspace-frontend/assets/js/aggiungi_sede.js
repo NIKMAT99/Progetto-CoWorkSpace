@@ -125,7 +125,7 @@ async function handleFormSubmit(e) {
 
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 15000); // Ridotto il timeout per un reindirizzamento più rapido
+            }, 100); // Ridotto il timeout per un reindirizzamento più rapido
         } else {
             const errorData = await response.json();
             console.error('Errore backend:', errorData);
