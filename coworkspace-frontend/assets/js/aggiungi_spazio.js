@@ -12,6 +12,7 @@ $(function () {
             description: $('#description').val(),
             services: $('#services').val(),
             price: Number($('#price').val()),
+            cover_image_url: null
         };
 
 
