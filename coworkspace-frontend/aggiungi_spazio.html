@@ -69,17 +69,6 @@
             </div>
           </div>
 
-          <div class="mb-4">
-            <label for="space-image" class="form-label">Immagine dello spazio</label>
-            <div class="file-upload">
-              <label class="file-upload-label">
-                <i class="fas fa-cloud-upload-alt me-2"></i>Scegli un'immagine
-                <input type="file" id="space-image" class="file-upload-input" accept="image/*">
-              </label>
-            </div>
-            <small class="text-muted">Formati accettati: JPG, PNG. Dimensione massima: 5MB</small>
-          </div>
-
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
             <button type="submit" class="btn btn-primary">
               <i class="fas fa-save me-2"></i>Crea Spazio
@@ -110,15 +99,6 @@
   document.getElementById('current-year').textContent = new Date().getFullYear();
   //TODO: sistemare db con immagini per spaces
 
-  // Mostra il nome del file selezionato
-  document.getElementById('space-image').addEventListener('change', function(e) {
-    if (this.files.length > 0) {
-      const fileName = this.files[0].name;
-      const label = this.closest('.file-upload').querySelector('.file-upload-label');
-      label.innerHTML = `<i class="fas fa-check-circle me-2"></i>${fileName}`;
-    }
-  });
-
 
   // Gestione form
   document.getElementById('space-form').addEventListener('submit', async function(e) {
@@ -130,7 +110,6 @@
           description: document.getElementById('description').value,
           services: document.getElementById('services').value,
           price: document.getElementById('price').value,
-          spaceimage: document.getElementById('space-image').value
       };
 
       try {
