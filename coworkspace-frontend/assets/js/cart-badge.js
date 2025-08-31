@@ -16,11 +16,11 @@ window.refreshCartBadge = async function () {
     const btn = document.getElementById('nav-cart-btn');
     const token = typeof getAuthToken === 'function' ? getAuthToken() : null;
 
-    if (!btn) return; // la pagina non ha il bottone
+    if (!btn) return;
 
     if (!token) {
         updateCartBadge(0);
-        btn.disabled = false; // tienilo cliccabile per mandare al login
+        btn.disabled = false;
         return;
     }
 

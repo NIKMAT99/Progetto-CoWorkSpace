@@ -67,18 +67,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                         </div>
                     `;
         } else {
-            /*container.innerHTML = spaces.map(space => `
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <img src="assets/img/spaces/${space.id}.jpg" class="card-img-top" alt="${space.type}" style="height: 200px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">${space.type}</h5>
-                                    <p class="card-text">${space.description || 'Spazio confortevole e ben attrezzato'}</p>
-                                    <p class="text-primary fw-bold">${space.price}€/ora</p>
-                                </div>
-                            </div>
-                        </div>
-            `).join('');*/
             container.innerHTML = spaces.map(space => {
                 // usa SOLO image_url dal DB; se manca, NIENTE <img>
                 const spaceImg = space.image_url

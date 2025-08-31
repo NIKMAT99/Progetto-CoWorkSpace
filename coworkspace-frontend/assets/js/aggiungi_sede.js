@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Assicurati che l'utente sia un admin prima di fare qualsiasi cos
     const form = document.getElementById('location-form');
     if (form) {
         form.addEventListener('submit', handleFormSubmit);
@@ -34,7 +33,6 @@ async function uploadImageIfAny(fileInput) {
 
     const file = fileInput.files[0];
     const formData = new FormData();
-    // La chiave 'image' deve corrispondere a quella attesa dal middleware Multer nel backend
     formData.append('cover_image_url', file);
 
     const token = localStorage.getItem('jwt_token');
@@ -57,7 +55,6 @@ async function uploadImageIfAny(fileInput) {
         }
 
         const result = await response.json();
-        // Assumendo che il backend risponda con { imageUrl: 'path/to/image.jpg' }
         return result.url;
 
     } catch (error) {
@@ -125,7 +122,7 @@ async function handleFormSubmit(e) {
 
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
-            }, 100); // Ridotto il timeout per un reindirizzamento più rapido
+            }, 100);
         } else {
             const errorData = await response.json();
             console.error('Errore backend:', errorData);

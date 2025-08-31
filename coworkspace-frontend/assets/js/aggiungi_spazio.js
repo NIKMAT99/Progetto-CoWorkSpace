@@ -1,4 +1,3 @@
-// assets/js/aggiungi_spazio.js
 $(function () {
     const token = getAuthToken();
     if (!token) return window.location.href = 'login.html';

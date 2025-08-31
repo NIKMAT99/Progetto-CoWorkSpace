@@ -11,7 +11,6 @@ $(document).ready(function () {
         }
 
         data.forEach(loc => {
-            // Usa cover_image_url invece di image_url
             const imgTag = loc.cover_image_url
                 ? `<img class="card-img-top" src="${loc.cover_image_url}" alt="${loc.name}" style="height: 200px; object-fit: cover;">`
                 : `<div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
